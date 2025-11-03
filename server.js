@@ -11,7 +11,7 @@ const app = express();
 // Middleware setup
 app.use(express.json());
 app.use(cors({
-  origin:[ process.env.CLIENT_URL],
+  origin:'http://localhost:3001',
   credentials: true
 }));
 app.use(cookieParser());   
@@ -43,7 +43,7 @@ app.get('/health', (_, res) => {
   res.json({ status: 'OK' });
 });
 
-// === 24/7 AUTO FETCH LOOP (NO PM2) ===
+// === 24/7 AUTO FETCH LOOP  ===
 
 startAutoFetcher();
 
