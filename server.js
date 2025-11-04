@@ -11,7 +11,10 @@ const app = express();
 // Middleware setup
 app.use(express.json());
 app.use(cors({
-  origin:'http://localhost:3001',
+  origin: [
+  'http://localhost:3001',
+  'https://freelance-autobidding-production.up.railway.app'
+],
   credentials: true
 }));
 app.use(cookieParser());   
