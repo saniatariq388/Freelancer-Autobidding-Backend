@@ -13,26 +13,30 @@ app.set('trust proxy', 1);
 app.use(express.json());
 // REPLACE your CORS block with this:
 const allowedOrigins = [
+  'https://freelance-autobidding-production.up.railway.app',
+  'http://localhost:3000',
   'http://localhost:3001',
-  'https://freelance-autobidding-production.up.railway.app', // aapka frontend
-];
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+]
 
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // server-to-server / curl etc.
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    return cb(new Error('CORS blocked: ' + origin));
+const corsOptions = {
+  origin(origin, cb) {
+    // Thunder Client/Postman ya server-to-server ke liye origin null hota hai: allow kar do
+    if (!origin) return cb(null, true);
+    // Frontend origin allow list me hona chahiye
+    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS: ' + origin), false);
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-}));
+  allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
+  exposedHeaders: ['Set-Cookie'],
+};
 
-// (optional) Preflight ko explicitly handle:
-app.options('*', cors({
-  origin: allowedOrigins,
-  credentials: true,
-}));
+app.use(cors(corsOptions));
+// Preflight ke liye:
+app.options('*', cors(corsOptions));
 
 app.use(cookieParser());   
 
