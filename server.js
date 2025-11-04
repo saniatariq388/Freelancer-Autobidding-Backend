@@ -22,21 +22,17 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin(origin, cb) {
-    // Thunder Client/Postman ya server-to-server ke liye origin null hota hai: allow kar do
-    if (!origin) return cb(null, true);
-    // Frontend origin allow list me hona chahiye
+    if (!origin) return cb(null, true); // curl/Postman/server-to-server
     if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    return cb(new Error('Not allowed by CORS: ' + origin), false);
+    return cb(new Error('Not allowed by CORS: ' + origin));
   },
   credentials: true,
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type','Authorization','X-Requested-With'],
   exposedHeaders: ['Set-Cookie'],
 };
-
 app.use(cors(corsOptions));
-// Preflight ke liye:
-app.options('*', cors(corsOptions));
+
 
 app.use(cookieParser());   
 
