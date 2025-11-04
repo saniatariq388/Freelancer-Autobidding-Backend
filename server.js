@@ -7,16 +7,33 @@ const cookieParser = require("cookie-parser");
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Middleware setup
 app.use(express.json());
-app.use(cors({
-  origin: [
+// REPLACE your CORS block with this:
+const allowedOrigins = [
   'http://localhost:3001',
-  'https://freelance-autobidding-production.up.railway.app'
-],
-  credentials: true
+  'https://freelance-autobidding-production.up.railway.app', // aapka frontend
+];
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // server-to-server / curl etc.
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('CORS blocked: ' + origin));
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
 }));
+
+// (optional) Preflight ko explicitly handle:
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 app.use(cookieParser());   
 
 // Connect to MongoDB
@@ -49,6 +66,17 @@ app.get('/health', (_, res) => {
 // === 24/7 AUTO FETCH LOOP  ===
 
 startAutoFetcher();
+
+app.use((req, res) => {
+  res.status(404).json({ ok: false, error: 'Not Found', path: req.originalUrl });
+});
+
+// Central error handler (kabhi throw ho to 500 JSON aaye)
+app.use((err, req, res, next) => {
+  console.error('💥 Server error:', err);
+  const msg = (err && err.message) ? err.message : 'Internal Server Error';
+  res.status(500).json({ ok: false, error: msg });
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;

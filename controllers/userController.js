@@ -254,13 +254,26 @@ exports.getSelfSmart = async (req, res) => {
     // set httpOnly cookie for future fast reads
     res.cookie("uid", String(data.id), {
       httpOnly: true,
-      sameSite: "lax",
+       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+       secure:   process.env.NODE_ENV === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
     return res.json({ ok: true, source: "freelancer", user: saved, cached: false });
   } catch (err) {
-    console.error("getSelfSmart error:", err?.message || err);
-    return res.status(500).json({ ok: false, error: err?.message || "Failed to resolve user" });
+  console.error("getSelfSmart error:", err?.message || err);
+
+  // 🔁 Try stale fallback by cookie uid if exists
+  const uidCookie = req.cookies?.uid ? Number(req.cookies.uid) : null;
+  if (uidCookie) {
+    const fallback = await User.findOne({ id: uidCookie }).lean();
+    if (fallback) {
+      return res.json({ ok: true, source: "mongo-stale", user: fallback, cached: true, error: String(err?.message || err) });
+    }
   }
+
+  // last resort: json 500 (par JSON hi rahe)
+  return res.status(500).json({ ok: false, error: err?.message || "Failed to resolve user" });
+}
+
 };
