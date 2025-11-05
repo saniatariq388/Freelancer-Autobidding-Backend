@@ -18,8 +18,8 @@ const startAutoFetcher = () => {
   }
 
   isRunning = true;
-  console.log("\nAUTO FETCHER STARTED (24/7 - NO PM2)");
-  console.log(`Har ${FETCH_INTERVAL_MIN} minute mein naye projects fetch honge...\n`);
+  console.log("\nAUTO FETCHER STARTED (24/7 )");
+  console.log(`New projects will be fetched every ${FETCH_INTERVAL_MIN} minutes...\n`);
 
   const runCycle = async () => {
     try {
