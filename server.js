@@ -23,7 +23,7 @@ const allowedOrigins = [
 const corsOptions = {
   origin(origin, cb) {
     if (!origin) return cb(null, true); // curl/Postman/server-to-server
-    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
     return cb(new Error('Not allowed by CORS: ' + origin));
   },
   credentials: true,
