@@ -18,7 +18,7 @@ router.get('/', getMyConfig);
 //router.get('/self', getMyConfig);    
 
 // Upsert config (create/update)
-router.put('/', updateMyConfig);     
+router.post('/', updateMyConfig);     
 //router.put('/self', updateMyConfig); 
 
 
