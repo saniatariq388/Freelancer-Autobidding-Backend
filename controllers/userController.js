@@ -254,8 +254,8 @@ exports.getSelfSmart = async (req, res) => {
     // set httpOnly cookie for future fast reads
     res.cookie("uid", String(data.id), {
       httpOnly: true,
-      sameSite: isProd ? 'none' : 'lax',  // cross-site ke liye 'none'
-      secure: isProd,
+      sameSite:  'none' ,  // cross-site ke liye 'none'
+      secure: true,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
